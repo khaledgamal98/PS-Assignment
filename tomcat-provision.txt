@@ -1,0 +1,28 @@
+#!/bin/bash
+set -e
+
+echo "updating system"
+sudo apt update
+
+echo "Installing Java 8"
+sudo apt install openjdk-8-jdk -y
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+export PATH=$JAVA_HOME/bin:$PATH
+
+echo "Downloading Apache tomcat 9"
+cd /opt/
+sudo wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.115/bin/apache-tomcat-9.0.115.tar.gz
+sudo tar -xzvf apache-tomcat-9.0.115.tar.gz
+
+echo "Setting Permission"
+sudo chown -R vagrant:vagrant /opt/apache-tomcat-9.0.115
+sudo chmod +x /opt/apache-tomcat-9.0.115/bin/*.sh
+
+#Changing tomcat port 8080 to port 7070 to match guest forwarded port
+sed -i 's/8080/7070/' /opt/apache-tomcat-9.0.115/conf/server.xml
+
+echo "starting tomcat"
+/opt/apache-tomcat-9.0.115/bin/startup.sh
+
+echo "tomcat installed and running on port 7070!"
+sudo ss -antup
